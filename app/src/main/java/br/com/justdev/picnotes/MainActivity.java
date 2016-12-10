@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
 
         Paint mPaint = new Paint();
         mPaint.setColor(Color.BLUE);
+        mPaint.setStrokeWidth(10);
+        mPaint.setStyle(Paint.Style.STROKE);
 
         ViewGroup layout = (ViewGroup) findViewById((R.id.mainLayout));
         drawView = new DrawView(this, mPaint);
