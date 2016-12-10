@@ -2,7 +2,10 @@ package br.com.justdev.picnotes;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Camera;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -36,8 +39,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
 
         PicNotes.setContext(this);
 
@@ -91,7 +94,34 @@ public class MainActivity extends AppCompatActivity {
             // show image
             ImageView imgView = (ImageView) findViewById(R.id.pictureView);
 
-            imgView.setImageURI(curPictureUri);
+            // Virar imagem
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            Bitmap bitSource = BitmapFactory.decodeFile(curPicturePath);
+            Bitmap bitmap = Bitmap.createBitmap(bitSource, 0, 0, bitSource.getWidth(), bitSource.getHeight(), matrix, true);
+
+            imgView.setImageBitmap(bitmap);
+
+            //imgView.setImageURI(curPictureUri);
+            //imgView.setRotation(90);
+
+            // Altera rotação dependendo da orientação da imagem, mas talvez não seja necessário
+            try {
+                ExifInterface exif = new ExifInterface(curPicturePath);
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                Log.d(getResources().getString(R.string.app_name), "picture orientation = " + orientation);
+                switch(orientation){
+                    case 3:
+                        break;
+                    case 6:
+                        break;
+                    case 8:
+                        break;
+                }
+            } catch (IOException ex) {
+                Log.e(getResources().getString(R.string.app_name), "could not load EXIF interface");
+                return;
+            }
         }
     }
 
