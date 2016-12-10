@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int TAKE_PICTURE_REQUEST = 1;
 
     private String curPicturePath;
+    private Uri curPictureUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     if (pictureFile != null) {
-                        Uri pictureUri = FileProvider.getUriForFile(PicNotes.context, "br.com.justdev.picnotes.fileprovider", pictureFile);
-                        camera.putExtra(MediaStore.EXTRA_OUTPUT, pictureUri);
+                        curPictureUri = FileProvider.getUriForFile(PicNotes.context, "br.com.justdev.picnotes.fileprovider", pictureFile);
+                        camera.putExtra(MediaStore.EXTRA_OUTPUT, curPictureUri);
                         startActivityForResult(camera, TAKE_PICTURE_REQUEST);
                     }
                 }
@@ -83,12 +85,13 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d(getResources().getString(R.string.app_name), "picture ok");
 
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get(curPicturePath);
+            //Bundle extras = data.getExtras();
+            //Bitmap imageBitmap = (Bitmap) extras.get(curPicturePath);
 
             // show image
+            ImageView imgView = (ImageView) findViewById(R.id.pictureView);
 
-
+            imgView.setImageURI(curPictureUri);
         }
     }
 
