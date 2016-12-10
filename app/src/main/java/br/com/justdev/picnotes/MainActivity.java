@@ -1,24 +1,29 @@
 package br.com.justdev.picnotes;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Camera;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -26,14 +31,14 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static br.com.justdev.picnotes.FileUriUtil.getOutputMediaFileUri;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final int TAKE_PICTURE_REQUEST = 1;
 
     private String curPicturePath;
     private Uri curPictureUri;
+
+    private DrawView drawView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,15 @@ public class MainActivity extends AppCompatActivity {
         //setSupportActionBar(toolbar);
 
         PicNotes.setContext(this);
+
+        Paint mPaint = new Paint();
+        mPaint.setColor(Color.BLUE);
+
+        ViewGroup layout = (ViewGroup) findViewById((R.id.mainLayout));
+        drawView = new DrawView(this, mPaint);
+        drawView.setLayoutParams(new AppBarLayout.LayoutParams(AppBarLayout.LayoutParams.WRAP_CONTENT, AppBarLayout.LayoutParams.WRAP_CONTENT));
+        layout.addView(drawView);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener(){
@@ -100,28 +114,9 @@ public class MainActivity extends AppCompatActivity {
             Bitmap bitSource = BitmapFactory.decodeFile(curPicturePath);
             Bitmap bitmap = Bitmap.createBitmap(bitSource, 0, 0, bitSource.getWidth(), bitSource.getHeight(), matrix, true);
 
-            imgView.setImageBitmap(bitmap);
+            drawView.setPictureBitmap(new BitmapDrawable(getResources(), bitmap));
 
-            //imgView.setImageURI(curPictureUri);
-            //imgView.setRotation(90);
-
-            // Altera rotação dependendo da orientação da imagem, mas talvez não seja necessário
-            try {
-                ExifInterface exif = new ExifInterface(curPicturePath);
-                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-                Log.d(getResources().getString(R.string.app_name), "picture orientation = " + orientation);
-                switch(orientation){
-                    case 3:
-                        break;
-                    case 6:
-                        break;
-                    case 8:
-                        break;
-                }
-            } catch (IOException ex) {
-                Log.e(getResources().getString(R.string.app_name), "could not load EXIF interface");
-                return;
-            }
+            //imgView.setImageBitmap(bitmap);
         }
     }
 
