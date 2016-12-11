@@ -50,29 +50,36 @@ public class MainActivity extends AppCompatActivity {
     RelativeLayout mDrawerPane;
     private DrawerLayout mDrawerLayout;
 
-    ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
+    ArrayList<NavItem> mNavItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
 
         PicNotes.setContext(this);
 
+        createDrawView();
+        createCameraButton();
+        createDrawerLayout();
+    }
+
+    private void createDrawView() {
         Paint mPaint = new Paint();
         mPaint.setColor(Color.BLUE);
         mPaint.setStrokeWidth(10);
         mPaint.setStyle(Paint.Style.STROKE);
 
+        // Cria View que suporta desenhos
         ViewGroup layout = (ViewGroup) findViewById((R.id.mainLayout));
         mDrawView = new DrawView(this, mPaint);
         mDrawView.setLayoutParams(new AppBarLayout.LayoutParams(AppBarLayout.LayoutParams.WRAP_CONTENT, AppBarLayout.LayoutParams.WRAP_CONTENT));
         layout.addView(mDrawView);
+    }
 
-
+    private void createCameraButton(){
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        // Cria listener
         fab.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -103,7 +110,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
+    private void createDrawerLayout(){
+        mNavItems = new ArrayList<NavItem>();
         mNavItems.add(new NavItem("Compartilhar", "", 0));
 
         // DrawerLayout
