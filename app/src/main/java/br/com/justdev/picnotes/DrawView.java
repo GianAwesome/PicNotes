@@ -15,6 +15,8 @@ import android.view.View;
  * Created by JustGian on 10/12/2016.
  */
 
+/* Baseado no exemplo FingerPaint do Android */
+
 public class DrawView extends View {
     private static final float MINP = 0.25f;
     private static final float MAXP = 0.75f;
