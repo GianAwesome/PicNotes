@@ -11,7 +11,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Created by JustGian on 11/12/2016.
+ * Created by Gian on 11/12/2016.
  */
 public class DrawViewTest {
     DrawView view;

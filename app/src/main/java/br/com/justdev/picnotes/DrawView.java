@@ -13,7 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 /**
- * Created by JustGian on 10/12/2016.
+ * Created by Gian on 10/12/2016.
  */
 
 /* Baseado no exemplo FingerPaint do Android */

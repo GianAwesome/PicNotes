@@ -6,7 +6,7 @@ import android.content.res.Resources;
 import android.util.Log;
 
 /**
- * Created by icg1 on 03/01/2016.
+ * Created by Gian on 03/01/2016.
  */
 public class PicNotes extends Application {
     protected static Context context;
