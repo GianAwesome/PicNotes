@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mNavItems.add(new NavItem("Salvar", "", 0));
+        mNavItems.add(new NavItem("Compartilhar", "", 0));
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -137,9 +137,16 @@ public class MainActivity extends AppCompatActivity {
 
                 switch(position){
                     case 0:
-                        saveImage();
+                        File path = saveCanvasToFile();
+                        // Verifica se arquivo foi criado antes de compartilhar
+                        if (path != null) {
+                            Intent shareIntent = new Intent();
+                            shareIntent.setAction(Intent.ACTION_SEND);
+                            shareIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(PicNotes.context, "br.com.justdev.picnotes.fileprovider", path));
+                            shareIntent.setType("image/jpeg");
+                            startActivity(shareIntent);
+                        }
                 }
-
             }
         });
     }
@@ -190,34 +197,36 @@ public class MainActivity extends AppCompatActivity {
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "PN_" + timeStamp + "_" + ".jpg";
+        String imageFileName = "PN_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
-        Log.d(getResources().getString(R.string.app_name), "creating file");
+        Log.d(getResources().getString(R.string.app_name), "creating temp file");
 
-        File image = new File(
-                storageDir,
-                imageFileName
+        File image = File.createTempFile(
+                imageFileName,
+                ".jpg",
+                storageDir
         );
 
-        Log.d(getResources().getString(R.string.app_name), "file created at " + image.getAbsolutePath());
+        Log.d(getResources().getString(R.string.app_name), "temp file created at " + image.getAbsolutePath());
 
         // Save a file: path for use with ACTION_VIEW intents
         curPicturePath = image.getAbsolutePath();
         return image;
     }
 
-    protected void saveImage() {
+    protected File saveCanvasToFile() {
 
         try {
             File f = createImageFile();
             f.createNewFile();
-            //Log.d(getResources().getString(R.string.app_name), "file created " + f.toString());
             FileOutputStream out = new FileOutputStream(f);
             mDrawView.getBitmap().compress(Bitmap.CompressFormat.PNG, 90, out);
+            return f;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
 
