@@ -3,6 +3,7 @@ package br.com.justdev.picnotes;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
@@ -26,6 +27,7 @@ public class DrawView extends View {
     private Paint mBitmapPaint;
     private Paint mPaint;
     private BitmapDrawable pictureBitmap;
+    private Rect mRect, mCanvasRect;
 
     public DrawView(Context c, Paint paint) {
         super(c);
@@ -39,13 +41,15 @@ public class DrawView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+        mCanvasRect = mCanvas.getClipBounds();
     }
     @Override
     protected void onDraw(Canvas canvas) {
         if (pictureBitmap == null)
             canvas.drawColor(0xFFAAAAAA);
         else
-            pictureBitmap.draw(canvas);
+            canvas.drawBitmap(pictureBitmap.getBitmap(), mRect, mCanvasRect, mBitmapPaint);
+            //pictureBitmap.draw(canvas);
             //canvas.drawBitmap(pictureBitmap, 0, 0, mPaint);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath(mPath, mPaint);
@@ -99,7 +103,17 @@ public class DrawView extends View {
     public void setPictureBitmap(BitmapDrawable b){
         pictureBitmap = b;
 
+        mRect = new Rect(0, 0, b.getBitmap().getWidth(), b.getBitmap().getHeight());
+
         Rect imageBounds = mCanvas.getClipBounds();
         pictureBitmap.setBounds(imageBounds);
+    }
+    public Bitmap getBitmap(){
+        Bitmap bmOverlay = Bitmap.createBitmap(mBitmap.getWidth(), mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bmOverlay);
+        canvas.drawBitmap(pictureBitmap.getBitmap(), mRect, mCanvasRect, mBitmapPaint);
+        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        return bmOverlay;
+        //return overlay(this.pictureBitmap.getBitmap(), this.mBitmap);
     }
 }

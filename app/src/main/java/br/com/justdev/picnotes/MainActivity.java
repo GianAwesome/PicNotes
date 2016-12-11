@@ -1,15 +1,12 @@
 package br.com.justdev.picnotes;
 
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,14 +14,11 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private String curPicturePath;
     private Uri curPictureUri;
 
-    private DrawView drawView;
+    private DrawView mDrawView;
 
     ListView mDrawerList;
     RelativeLayout mDrawerPane;
@@ -72,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
         mPaint.setStyle(Paint.Style.STROKE);
 
         ViewGroup layout = (ViewGroup) findViewById((R.id.mainLayout));
-        drawView = new DrawView(this, mPaint);
-        drawView.setLayoutParams(new AppBarLayout.LayoutParams(AppBarLayout.LayoutParams.WRAP_CONTENT, AppBarLayout.LayoutParams.WRAP_CONTENT));
-        layout.addView(drawView);
+        mDrawView = new DrawView(this, mPaint);
+        mDrawView.setLayoutParams(new AppBarLayout.LayoutParams(AppBarLayout.LayoutParams.WRAP_CONTENT, AppBarLayout.LayoutParams.WRAP_CONTENT));
+        layout.addView(mDrawView);
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -140,6 +135,10 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(getResources().getString(R.string.app_name), "drawer item " + position);
 
+                switch(position){
+                    case 0:
+                        saveImage();
+                }
 
             }
         });
@@ -162,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap bitSource = BitmapFactory.decodeFile(curPicturePath);
             Bitmap bitmap = Bitmap.createBitmap(bitSource, 0, 0, bitSource.getWidth(), bitSource.getHeight(), matrix, true);
 
-            drawView.setPictureBitmap(new BitmapDrawable(getResources(), bitmap));
+            mDrawView.setPictureBitmap(new BitmapDrawable(getResources(), bitmap));
         }
     }
 
@@ -191,23 +190,36 @@ public class MainActivity extends AppCompatActivity {
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "PN_" + timeStamp + "_";
+        String imageFileName = "PN_" + timeStamp + "_" + ".jpg";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
-        Log.d(getResources().getString(R.string.app_name), "creating temp file");
+        Log.d(getResources().getString(R.string.app_name), "creating file");
 
-        File image = File.createTempFile(
-                imageFileName,  // prefix
-                ".jpg",         // sufix
-                storageDir      // dir
+        File image = new File(
+                storageDir,
+                imageFileName
         );
 
-        Log.d(getResources().getString(R.string.app_name), "temp file created at " + image.getAbsolutePath());
+        Log.d(getResources().getString(R.string.app_name), "file created at " + image.getAbsolutePath());
 
         // Save a file: path for use with ACTION_VIEW intents
         curPicturePath = image.getAbsolutePath();
         return image;
     }
+
+    protected void saveImage() {
+
+        try {
+            File f = createImageFile();
+            f.createNewFile();
+            //Log.d(getResources().getString(R.string.app_name), "file created " + f.toString());
+            FileOutputStream out = new FileOutputStream(f);
+            mDrawView.getBitmap().compress(Bitmap.CompressFormat.PNG, 90, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // Usado para definir cada item do menu
     // Baseado em http://codetheory.in/android-navigation-drawer/
